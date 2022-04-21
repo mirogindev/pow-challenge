@@ -46,8 +46,8 @@ func GenerateChallenge(remoteClient string, difficulty int) *HashCashData {
 	return ms
 }
 
-func ResolveChallenge(m HashCashData, maxIters int) (*HashCashData, error) {
-	var counter int
+func ResolveChallenge(m HashCashData, maxIters int64) (*HashCashData, error) {
+	var counter int64
 	var initRanVal = rand.Intn(1000000)
 	for counter <= maxIters {
 		m.Counter = base64.StdEncoding.EncodeToString([]byte(string(initRanVal)))

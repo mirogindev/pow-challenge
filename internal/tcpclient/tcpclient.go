@@ -11,7 +11,7 @@ import (
 )
 
 type TcpClient struct {
-	MaxIters int
+	MaxIters int64
 	Addr     string
 	conn     net.Conn
 }

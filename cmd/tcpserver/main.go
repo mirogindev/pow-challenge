@@ -1,22 +1,17 @@
 package main
 
 import (
+	"github.com/mirogindev/pow-challenge/config"
 	"github.com/mirogindev/pow-challenge/internal/db"
 	"github.com/mirogindev/pow-challenge/internal/tcpserver"
+	"github.com/mirogindev/pow-challenge/internal/tools"
 	log "github.com/sirupsen/logrus"
 	"path"
-	"path/filepath"
-	"runtime"
-)
-
-var (
-	_, b, _, _ = runtime.Caller(0)
-	bp         = filepath.Dir(b)
 )
 
 func main() {
 	log.SetLevel(log.TraceLevel)
-	qu, err := tcpserver.GetQuotesFromFile(path.Join(b, "../../../assets", "quotes.txt"))
+	qu, err := tcpserver.GetQuotesFromFile(path.Join(tools.GetBasePath(), "../../assets", "quotes.txt"))
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -33,10 +28,13 @@ func main() {
 		return
 	}
 
+	conf := config.GetConfig()
+
 	ts := tcpserver.TcpServer{
-		Port:       8093,
+		Host:       conf.Host,
+		Port:       conf.Port,
 		DB:         db,
-		Difficulty: 4,
+		Difficulty: conf.Difficulty,
 		Quotes:     qu,
 	}
 	err = ts.Start()

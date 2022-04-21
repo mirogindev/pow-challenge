@@ -13,6 +13,7 @@ import (
 )
 
 type TcpServer struct {
+	Host       string
 	Port       int
 	Difficulty int
 	Quotes     Quotes
@@ -27,6 +28,7 @@ func (s *TcpServer) Start() error {
 	}
 
 	log.WithFields(log.Fields{
+		"host":       s.Host,
 		"port":       s.Port,
 		"difficulty": s.Difficulty,
 		"quotes":     len(s.Quotes),

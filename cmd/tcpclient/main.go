@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"github.com/mirogindev/pow-challenge/config"
 	"github.com/mirogindev/pow-challenge/internal/hashcash"
 	"github.com/mirogindev/pow-challenge/internal/protocol"
 	"github.com/mirogindev/pow-challenge/internal/tcpclient"
@@ -11,8 +13,8 @@ import (
 
 func main() {
 	log.SetLevel(log.TraceLevel)
-
-	tc := &tcpclient.TcpClient{Addr: "localhost:8093", MaxIters: 10000000}
+	conf := config.GetConfig()
+	tc := &tcpclient.TcpClient{Addr: fmt.Sprintf("%s:%v", conf.Host, conf.Port), MaxIters: conf.MaxIterations}
 	err := tc.Connect()
 	if err != nil {
 		log.WithFields(log.Fields{
