@@ -1,6 +1,6 @@
 # Pow challenge
 
-[Go 1.18](https://go.dev/dl/)
++ [Go 1.18](https://go.dev/dl/)
 
 In this application, I designed and implemented a "Word of Wisdom" tcp server, 
 which is protected from DDOS attacks using the "Proof of work" algorithm.
@@ -9,7 +9,7 @@ which is protected from DDOS attacks using the "Proof of work" algorithm.
 In the process of choosing an algorithm, I considered the following
 
 ### Hashcash
-https://ru.wikipedia.org/wiki/Hashcash
+https://ru.wikipedia.org/wiki/Hashcash \
 Is a proof-of-work system used to reduce spam and DoS attacks
 
 #### Pros
@@ -22,7 +22,7 @@ Is a proof-of-work system used to reduce spam and DoS attacks
 + Hashcash requires significant computational for a client  and may not be suitable for systems with low performance
 
 ### Merkle tree
-https://en.wikipedia.org/wiki/Merkle_tree
+https://en.wikipedia.org/wiki/Merkle_tree \
 A hash tree allows efficient and secure verification of the contents of a large data structure.
 
 #### Pros
@@ -33,8 +33,8 @@ A hash tree allows efficient and secure verification of the contents of a large 
 + Requires complex calculations from the server
 + Difficult to implement for the current task
 
-###Guided tour puzzle protocol
-https://en.wikipedia.org/wiki/Guided_tour_puzzle_protocol
+### Guided tour puzzle protocol
+https://en.wikipedia.org/wiki/Guided_tour_puzzle_protocol \
 Guided tour puzzle (GTP) protocol is a cryptographic protocol for mitigating application layer denial of service attacks.
 
 #### Pros
