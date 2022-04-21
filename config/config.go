@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
 type Config struct {
@@ -14,6 +15,7 @@ type Config struct {
 	Host          string `yaml:"host"`
 	Port          int    `yaml:"port"`
 	MaxIterations int64  `yaml:"maxIterations"`
+	LogLevel      string `yaml:"logLevel"`
 }
 
 var cfg *Config
@@ -27,12 +29,24 @@ func init() {
 		log.WithFields(log.Fields{
 			"err": err,
 		}).Debug("cannot parse config, will be used default values")
-		cfg = &Config{Difficulty: 2, Host: "localhost", Port: 8085, MaxIterations: 1000000}
+		cfg = &Config{Difficulty: 2, Host: "localhost", Port: 8085, MaxIterations: 1000000, LogLevel: "INFO"}
 	}
 }
 
 func GetConfig() *Config {
 	return cfg
+}
+
+func GetLogLevelFromString(s string) log.Level {
+	switch s := strings.ToLower(s); s {
+	case "trace":
+		return log.TraceLevel
+	case "debug":
+		return log.DebugLevel
+	default:
+		return log.InfoLevel
+	}
+	return 0
 }
 
 func parseConfig(p string) (*Config, error) {

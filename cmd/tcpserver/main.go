@@ -10,7 +10,8 @@ import (
 )
 
 func main() {
-	log.SetLevel(log.TraceLevel)
+	conf := config.GetConfig()
+	log.SetLevel(config.GetLogLevelFromString(conf.LogLevel))
 	qu, err := tcpserver.GetQuotesFromFile(path.Join(tools.GetBasePath(), "../../assets", "quotes.txt"))
 
 	if err != nil {
@@ -27,8 +28,6 @@ func main() {
 		}).Panic("cannot get quotes")
 		return
 	}
-
-	conf := config.GetConfig()
 
 	ts := tcpserver.TcpServer{
 		Host:       conf.Host,

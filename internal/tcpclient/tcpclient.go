@@ -97,7 +97,7 @@ func (c *TcpClient) SendMessageWithReply(ms *protocol.Message) (*protocol.Messag
 
 	log.WithFields(log.Fields{
 		"quote": string(p.Payload),
-	}).Debug("quote received")
+	}).Println("quote received")
 
 	if err != nil {
 		return nil, err

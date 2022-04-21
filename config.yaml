@@ -1,4 +1,5 @@
-difficulty: 4
-host: localhost
-port: 8086
-maxIterations: 555555555
+difficulty: ${DIFFICULTY}
+host: ${SERVER_HOST}
+port: ${SERVER_PORT}
+maxIterations: ${MAX_ITERATIONS}
+logLevel: ${LOG_LEVEL}

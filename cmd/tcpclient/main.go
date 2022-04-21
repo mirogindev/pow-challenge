@@ -12,8 +12,9 @@ import (
 )
 
 func main() {
-	log.SetLevel(log.TraceLevel)
+
 	conf := config.GetConfig()
+	log.SetLevel(config.GetLogLevelFromString(conf.LogLevel))
 	tc := &tcpclient.TcpClient{Addr: fmt.Sprintf("%s:%v", conf.Host, conf.Port), MaxIters: conf.MaxIterations}
 	err := tc.Connect()
 	if err != nil {
