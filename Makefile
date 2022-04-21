@@ -13,6 +13,6 @@ client-start:
 compose-build:
 	docker-compose build
 
-compose-up:
+compose-start:
 	docker-compose up
 
