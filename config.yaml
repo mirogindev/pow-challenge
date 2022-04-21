@@ -1,5 +1,5 @@
-difficulty: ${DIFFICULTY}
-host: ${SERVER_HOST}
-port: ${SERVER_PORT}
-maxIterations: ${MAX_ITERATIONS}
-logLevel: ${LOG_LEVEL}
+difficulty: 3
+host: localhost
+port: 9090
+maxIterations: 1000000
+logLevel: TRACE

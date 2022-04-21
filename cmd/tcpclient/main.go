@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-
+	//get current config
 	conf := config.GetConfig()
 	log.SetLevel(config.GetLogLevelFromString(conf.LogLevel))
 	tc := &tcpclient.TcpClient{Addr: fmt.Sprintf("%s:%v", conf.Host, conf.Port), MaxIters: conf.MaxIterations}
@@ -26,6 +26,7 @@ func main() {
 	defer tc.CloseSession()
 
 	for {
+		//every second trying to receive new quote from the server
 		time.Sleep(1 * time.Second)
 		ms := &protocol.Message{
 			Header: protocol.RequestChallenge,

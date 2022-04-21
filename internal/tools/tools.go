@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/mirogindev/pow-challenge/internal/timeresolver"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -21,9 +22,9 @@ func ParseDateTime(s string) (time.Time, error) {
 	return time.Parse(layout, s)
 }
 
-func CheckDateExpired(d time.Time) bool {
+func CheckDateExpired(d time.Time, tr timeresolver.TimeResolver) bool {
 	expiresAt := d.Add(48 * time.Hour)
-	return time.Now().Unix() > expiresAt.Unix()
+	return tr.Now().Unix() > expiresAt.Unix()
 }
 
 func GetBasePath() string {

@@ -9,3 +9,10 @@ server-start:
 
 client-start:
 	go run cmd/tcpclient/main.go
+
+compose-build:
+	docker-compose build
+
+compose-up:
+	docker-compose up
+

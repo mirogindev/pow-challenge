@@ -7,17 +7,19 @@ import (
 	"github.com/mirogindev/pow-challenge/internal/db"
 	"github.com/mirogindev/pow-challenge/internal/hashcash"
 	"github.com/mirogindev/pow-challenge/internal/protocol"
+	"github.com/mirogindev/pow-challenge/internal/timeresolver"
 	"github.com/mirogindev/pow-challenge/internal/tools"
 	log "github.com/sirupsen/logrus"
 	"net"
 )
 
 type TcpServer struct {
-	Host       string
-	Port       int
-	Difficulty int
-	Quotes     Quotes
-	DB         db.DB
+	Host         string
+	Port         int
+	Difficulty   int
+	Quotes       Quotes
+	DB           db.DB
+	TimeResolver timeresolver.TimeResolver
 }
 
 func (s *TcpServer) Start() error {
@@ -51,6 +53,7 @@ func (s *TcpServer) Start() error {
 	}
 }
 
+//Handle new tcp connection
 func (s *TcpServer) handleConnection(c net.Conn) {
 	log.WithFields(log.Fields{
 		"remoteAddr": c.RemoteAddr().String(),
@@ -87,6 +90,7 @@ func (s *TcpServer) handleConnection(c net.Conn) {
 	}
 }
 
+//This method processed all clients requests
 func (s *TcpServer) processMessage(data, remoteClient string) (*protocol.Message, error) {
 	hashCol, _ := s.DB.GetCollection(db.HashCollection)
 	resCol, _ := s.DB.GetCollection(db.ResourcesCollection)
@@ -108,10 +112,10 @@ func (s *TcpServer) processMessage(data, remoteClient string) (*protocol.Message
 			requestLogger.Traceln(protocol.UnmarshallErr)
 			return nil, protocol.UnmarshallErr
 		}
-
-		if !resCol.KeyExist(remoteClient) {
-			requestLogger.Traceln(protocol.ResNotFoundErr)
-			return nil, protocol.ResNotFoundErr
+		//Check if remote client exits in the database
+		if !resCol.KeyExist(hashData.Resource) {
+			requestLogger.Traceln(protocol.InvalidResourceErr)
+			return nil, protocol.InvalidResourceErr
 		}
 
 		hd, err := tools.ParseDateTime(hashData.Date)
@@ -119,16 +123,20 @@ func (s *TcpServer) processMessage(data, remoteClient string) (*protocol.Message
 			requestLogger.Traceln(protocol.ParseDateErr)
 			return nil, protocol.ParseDateErr
 		}
-
-		exp := tools.CheckDateExpired(hd)
+		//Check if date generate no longer than 2 days ago
+		//as described here https://ru.wikipedia.org/wiki/Hashcash
+		exp := tools.CheckDateExpired(hd, s.TimeResolver)
 		if exp {
 			requestLogger.Traceln(protocol.DateExprErr)
 			return nil, protocol.DateExprErr
 		} else {
 			requestLogger.Traceln("received a valid date")
 		}
-
+		//Check if hash has required number of zeros
 		if hash, ok := hashcash.IsChallengeValid(&hashData); ok {
+
+			//Checking that the hash has not been used
+			// if not  add it to the db
 			if hashCol.KeyExist(hash) {
 				log.WithFields(log.Fields{
 					"msg": hashData.ToString(),
@@ -142,13 +150,18 @@ func (s *TcpServer) processMessage(data, remoteClient string) (*protocol.Message
 				"msg": hashData.ToString(),
 			}).Debug("received a valid challenge")
 
-			ms := &protocol.Message{Header: protocol.RequestData, Payload: []byte(s.Quotes.GetRandomQuote())}
+			//If all test passed  then send to a client a random quote
+			ms := &protocol.Message{Header: protocol.ResponseData, Payload: []byte(s.Quotes.GetRandomQuote())}
 			return ms, nil
+		} else {
+			return nil, protocol.InvalidChallengeErr
 		}
 
 	case protocol.RequestChallenge:
-		hd := hashcash.GenerateChallenge(remoteClient, s.Difficulty)
+		//Generate challenge for the client
+		hd := hashcash.GenerateChallenge(remoteClient, s.Difficulty, s.TimeResolver)
 
+		//Add remote client to the db
 		if !resCol.KeyExist(remoteClient) {
 			err := resCol.AddKeyValue(remoteClient, remoteClient)
 			if err != nil {
@@ -156,14 +169,15 @@ func (s *TcpServer) processMessage(data, remoteClient string) (*protocol.Message
 			}
 		}
 
-		b, err := json.Marshal(hd)
+		payload, err := json.Marshal(hd)
 
 		if err != nil {
 			log.Println(err)
 			return nil, protocol.SerErr
 		}
 
-		ms := &protocol.Message{Header: protocol.ResponseChallenge, Payload: b}
+		//Send this challenge back to the client
+		ms := &protocol.Message{Header: protocol.ResponseChallenge, Payload: payload}
 		return ms, nil
 	}
 

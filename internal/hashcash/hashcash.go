@@ -5,10 +5,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/mirogindev/pow-challenge/internal/timeresolver"
 	"github.com/mirogindev/pow-challenge/internal/tools"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
-	"time"
 )
 
 const (
@@ -32,25 +32,30 @@ func (d *HashCashData) ToString() string {
 	return fmt.Sprintf("%v:%d:%s:%s::%s:%s", d.Ver, d.Bits, d.Date, d.Resource, d.Rand, d.Counter)
 }
 
-func GenerateChallenge(remoteClient string, difficulty int) *HashCashData {
+// GenerateChallenge - generate challenge for client
+func GenerateChallenge(remoteClient string, difficulty int, ts timeresolver.TimeResolver) *HashCashData {
+
+	//generate a random number for challenge
 	rand := rand.Intn(1000000)
 	ms := &HashCashData{
 		Ver:      1,
 		Bits:     difficulty,
-		Rand:     base64.StdEncoding.EncodeToString([]byte(string(rand))),
-		Counter:  base64.StdEncoding.EncodeToString([]byte(string(0))),
-		Date:     tools.GetFormattedDateTime(time.Now()),
+		Rand:     base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v", rand))),
+		Counter:  base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v", 0))),
+		Date:     tools.GetFormattedDateTime(ts.Now()),
 		Resource: remoteClient,
 	}
 
 	return ms
 }
 
+// ResolveChallenge - method which trying to resolve challenge
 func ResolveChallenge(m HashCashData, maxIters int64) (*HashCashData, error) {
 	var counter int64
+
 	var initRanVal = rand.Intn(1000000)
 	for counter <= maxIters {
-		m.Counter = base64.StdEncoding.EncodeToString([]byte(string(initRanVal)))
+		m.Counter = base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v", initRanVal)))
 		if h, ok := IsChallengeValid(&m); ok {
 			log.WithFields(log.Fields{
 				"msg":        m.ToString(),

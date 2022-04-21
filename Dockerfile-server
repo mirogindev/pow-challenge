@@ -13,6 +13,6 @@ FROM scratch
 
 COPY --from=builder /build/main /
 COPY --from=builder /build/assets/quotes.txt /build/assets/quotes.txt
-COPY --from=builder /build/config.yaml /build/config.yaml
+COPY --from=builder /build/config-prod.yaml /build/config.yaml
 
 ENTRYPOINT ["/main"]
