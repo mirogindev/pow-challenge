@@ -15,4 +15,3 @@ compose-build:
 
 compose-start:
 	docker-compose up
-

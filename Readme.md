@@ -6,7 +6,7 @@ In this application, I designed and implemented a "Word of Wisdom" tcp server,
 which is protected from DDOS attacks using the "Proof of work" algorithm.
 
 ## Choice of “Proof of work” algorithm
-In the process of choosing an algorithm, I considered the following
+In the process of choosing an algorithm, I considered the following:
 
 ### Hashcash
 https://ru.wikipedia.org/wiki/Hashcash \
@@ -31,7 +31,7 @@ A hash tree allows efficient and secure verification of the contents of a large 
 
 #### Cons
 + Requires complex calculations from the server
-+ Difficult to implement for the current task
+
 
 ### Guided tour puzzle protocol
 https://en.wikipedia.org/wiki/Guided_tour_puzzle_protocol \
@@ -71,4 +71,10 @@ docker-compose up
 make server-start
 make client-start
 ```
+
+### Run tests
+```
+make test
+```
+
 
